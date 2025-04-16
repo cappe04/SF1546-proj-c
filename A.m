@@ -19,3 +19,4 @@ plot_solution(u1, p_crit, net_dist, valid_serve);
 % VÄRDEN
 PUNKTER = p_crit(1:2, 1)
 ERROR = p_crit(1:2, 2) + e_tot(1)
+Tung Tung
