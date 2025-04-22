@@ -12,68 +12,70 @@ function [u, p_crit, net_dist, e, e_net, t] = step_solve(vars, u0, h)
     ]';
 
     u(1, :) = u0;
+    u2h = u0;
+    u2h_offset = 0;
     p_crit = [];
     t(1) = 0;
     i = 1;
-
-    function y = minimize_y(u)
-        y = u(3);
-    end
-
-    function x = minimize_net_dist(u)
-        x = u(1) - vars.x_net;
-    end
-
-    function x = minimize_end_dist(u)
-        x = u(1) - vars.x_end;
-    end
 
     e = [0 0 0 0];
     e_net = 0;
     net_dist = 0;
 
+    % Hur t_err propogerar i u via k:et från RK4 (löser ut k)
+    u_err = @(t_new, u_new, t_err) t_err*(rk4_step(f, t_new, u_new, h) - u_new)/h;
+
     while u(end, 1) < vars.x_end
         u(i+1, :) = rk4_step(f, t(i), u(i, :), h);
+
+        if(mod(i-u2h_offset, 2) == 0)
+            u2h = rk4_step(f, t(i), u2h, 2*h);
+        end
+
+        t(i+1) = t(i)+h;
 
         % kolla studs
         if(u(i+1, 3) <= 0)
 
-            [t_new, u_new, e_u] = adaptive_step(f, @minimize_y, u(i, :), u(i-1, :), t(i), h);
+            if(mod(i-u2h_offset, 2) == 0)
+                % abs(u2h - u(i+1, :))
+                e = e + abs(u2h - u(i+1, :));
+            else
+                % abs(u2h - u(i, :))
+                e = e + abs(u2h - u(i, :));
+            end
+
+            [t_new, u_new, t_err] = interp(t, u, 3, 0);
             u(i+1, :) = u_new;
             t(i+1) = t_new;
+            % t_err
 
-            u(i+1, 4) = abs(u(i+1, 4));
+            e = e + u_err(t_new, u_new, t_err); % error i u via t_err
 
-            p_crit(end+1, :) = [u(i+1, 1), u(i+1, 3)];
+            u(i+1, 4) = abs(u(i+1, 4)); % ändra riktning på boll
+            p_crit(end+1, :) = [u(i+1, 1), u(i+1, 3)]; % lägg till i kritiska punkter (studs punkt)
+            
+            u2h = u(i+1, :);
+            u2h_offset = i;
 
-            e = e + abs(e_u) + ones(1,4)*abs(u(i+1, 3)); % felet i rk4 steget + felet i y (adderat på alla för att vi kan inte göra rätt)
-
-            i = i + 1;
-            dt = h - (t(i) - t(i-1));
-            u(i+1, :) = rk4_step(f, t(i), u(i, :), dt); % ett extra steg för att förskjuta tidsstegen rätt
-            t(i+1) = t(i) + dt;
+        end
 
         % kolla nät
-        elseif(u(i, 1) < vars.x_net && u(i+1, 1) >= vars.x_net)
-            [~, u_new, e_u] = adaptive_step(f, @minimize_net_dist, u(i, :), u(i-1, :), t(i), h);
-            net_dist = u_new(3) - vars.net_height;
-            e_net = abs(e_u(3)) + abs(u_new(1) - vars.x_net);
-            t(i+1) = t(end) + h;
+        if(u(i, 1) < vars.x_net && u(i+1, 1) >= vars.x_net)
 
-        % updatera tid
-        else
-            t(i+1) = t(i) + h;
+            [t_new, u_new, t_err] = interp(t, u, 1, vars.x_net);
+            net_dist = u_new(3) - vars.net_height;
+            e_net = e + u_err(t_new, u_new, t_err);
         end
-        
+
         i = i + 1;
         
     end
 
     % justera sista värdet så att x är nära vars.x_end
-    [t_new, u_new, ~] = adaptive_step(f, @minimize_end_dist, u(end-1, :), u(end-2, :), t(end), h);
+    [t_new, u_new, t_err] = interp(t, u, 1, vars.x_end);
     t(end) = t_new;
     u(end,:) = u_new;
-    
-    e_net = e(3) + e_net;
+    e = e + u_err(t_new, u_new, t_err);
 
 end
