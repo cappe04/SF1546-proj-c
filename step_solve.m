@@ -1,7 +1,9 @@
-function [u, p_crit, net_dist, e, e_net, t] = step_solve(vars, u0, h)
+function [u, p_crit, net_dist, E, t] = step_solve(vars, u0, h)
 
     % format u0, u: x x' y y'
-    % format p_crit: x y
+    % format p_crit: x y e
+
+    E = struct("u", [0, 0, 0, 0], "net", 0, "time", 0);
 
     V = @(x_dot, y_dot) sqrt(x_dot^2 + y_dot^2);
     f = @(u, t) [
@@ -18,12 +20,10 @@ function [u, p_crit, net_dist, e, e_net, t] = step_solve(vars, u0, h)
     t(1) = 0;
     i = 1;
 
-    e = [0 0 0 0];
-    e_net = 0;
     net_dist = 0;
 
     % Hur t_err propogerar i u via k:et från RK4 (löser ut k)
-    u_err = @(t_new, u_new, t_err) t_err*(rk4_step(f, t_new, u_new, h) - u_new)/h;
+    u_err = @(t_new, u_new, t_err) abs(t_err*(rk4_step(f, t_new, u_new, h) - u_new)/h);
 
     while u(end, 1) < vars.x_end
         u(i+1, :) = rk4_step(f, t(i), u(i, :), h);
@@ -38,22 +38,20 @@ function [u, p_crit, net_dist, e, e_net, t] = step_solve(vars, u0, h)
         if(u(i+1, 3) <= 0)
 
             if(mod(i-u2h_offset, 2) == 0)
-                % abs(u2h - u(i+1, :))
-                e = e + abs(u2h - u(i+1, :));
+                E.u = E.u + abs(u2h - u(i+1, :));
             else
-                % abs(u2h - u(i, :))
-                e = e + abs(u2h - u(i, :));
+                E.u = E.u + abs(u2h - u(i, :));
             end
 
             [t_new, u_new, t_err] = interp(t, u, 3, 0);
             u(i+1, :) = u_new;
             t(i+1) = t_new;
-            % t_err
 
-            e = e + u_err(t_new, u_new, t_err); % error i u via t_err
+            E.time = E.time + t_err;
+            E.u = E.u + u_err(t_new, u_new, t_err); % error i u via t_err
 
             u(i+1, 4) = abs(u(i+1, 4)); % ändra riktning på boll
-            p_crit(end+1, :) = [u(i+1, 1), u(i+1, 3)]; % lägg till i kritiska punkter (studs punkt)
+            p_crit(end+1, :) = [u(i+1, 1), u(i+1, 3), E.u]; % lägg till i kritiska punkter (studs punkt)
             
             u2h = u(i+1, :);
             u2h_offset = i;
@@ -65,7 +63,7 @@ function [u, p_crit, net_dist, e, e_net, t] = step_solve(vars, u0, h)
 
             [t_new, u_new, t_err] = interp(t, u, 1, vars.x_net);
             net_dist = u_new(3) - vars.net_height;
-            e_net = e + u_err(t_new, u_new, t_err);
+            E.net = E.u + u_err(t_new, u_new, t_err);
         end
 
         i = i + 1;
@@ -76,6 +74,8 @@ function [u, p_crit, net_dist, e, e_net, t] = step_solve(vars, u0, h)
     [t_new, u_new, t_err] = interp(t, u, 1, vars.x_end);
     t(end) = t_new;
     u(end,:) = u_new;
-    e = e + u_err(t_new, u_new, t_err);
+
+    E.time = E.time + t_err;
+    E.u = E.u + u_err(t_new, u_new, t_err);
 
 end

@@ -4,7 +4,7 @@ vars = get_vars(ones(1, 8));
 
 h = 0.0001;
 
-[u, p_crit, net_dist, e, ~, ~] = step_solve(vars, [0, 4, vars.y_start, 0], h);
+[u, p_crit, net_dist, E, ~] = step_solve(vars, [0, 4, vars.y_start, 0], h);
 
 % VALIDERING AV SERV
 valid_serve = validate_serve(vars, p_crit, net_dist);
