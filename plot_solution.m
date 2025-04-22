@@ -16,7 +16,12 @@ function [] = plot_solution(p, p_crit, net_distance, is_valid)
 
     plot(p(:, 1), p(:, 3)); % plot graph
     if ~isempty(p_crit)
-        plot(p_crit(:, 1), p_crit(:, 2), "redo"); % plot bounce points
+        plot(p_crit(:, 1), p_crit(:, 2), "red*"); % plot bounce points
+
+        % Plot boxes to show each error around the point
+        for i=1:size(p_crit, 1)
+            rectangle("Position", [p_crit(i, 1)-p_crit(i, 3), p_crit(i, 2)-p_crit(i, 5), p_crit(i, 3)*2, p_crit(i, 5)*2], "EdgeColor", "r");
+        end
     end
 
     % plot intesection with net
