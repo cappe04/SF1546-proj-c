@@ -24,17 +24,19 @@ function [u, p_crit, net_dist, e, e_net, t] = step_solve(vars, u0, h)
         x = u(1) - vars.x_net;
     end
 
+    function x = minimize_end_dist(u)
+        x = u(1) - vars.x_end;
+    end
+
     e = [0 0 0 0];
     e_net = 0;
     net_dist = 0;
 
-    % while u(end, 1) < vars.x_end
-    while t < 2
-
+    while u(end, 1) < vars.x_end
         u(i+1, :) = rk4_step(f, t(i), u(i, :), h);
 
         % kolla studs
-        if(u(i+1, 3) <= 0) && false
+        if(u(i+1, 3) <= 0)
 
             [t_new, u_new, e_u] = adaptive_step(f, @minimize_y, u(i, :), u(i-1, :), t(i), h);
             u(i+1, :) = u_new;
@@ -48,7 +50,7 @@ function [u, p_crit, net_dist, e, e_net, t] = step_solve(vars, u0, h)
 
             i = i + 1;
             dt = h - (t(i) - t(i-1));
-            u(i+1, :) = rk4_step(f, t(i), u(i, :), dt); % OBS i+=1
+            u(i+1, :) = rk4_step(f, t(i), u(i, :), dt); % ett extra steg för att förskjuta tidsstegen rätt
             t(i+1) = t(i) + dt;
 
         % kolla nät
@@ -66,6 +68,11 @@ function [u, p_crit, net_dist, e, e_net, t] = step_solve(vars, u0, h)
         i = i + 1;
         
     end
+
+    % justera sista värdet så att x är nära vars.x_end
+    [t_new, u_new, ~] = adaptive_step(f, @minimize_end_dist, u(end-1, :), u(end-2, :), t(end), h);
+    t(end) = t_new;
+    u(end,:) = u_new;
     
     e_net = e(3) + e_net;
 
