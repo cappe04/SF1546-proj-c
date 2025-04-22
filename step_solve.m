@@ -53,7 +53,7 @@ function [u, p_crit, net_dist, e, e_net, t] = step_solve(vars, u0, h)
 
         % kolla nät
         elseif(u(i, 1) < vars.x_net && u(i+1, 1) >= vars.x_net)
-            [~, u_new, e_u] = adaptive_step(f, @minimize_net_dist, u(i+1, :), u(i, :), t(i), h);
+            [~, u_new, e_u] = adaptive_step(f, @minimize_net_dist, u(i, :), u(i-1, :), t(i), h);
             net_dist = u_new(3) - vars.net_height;
             e_net = abs(e_u(3)) + abs(u_new(1) - vars.x_net);
             t(i+1) = t(end) + h;

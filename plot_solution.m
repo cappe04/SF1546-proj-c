@@ -15,7 +15,9 @@ function [] = plot_solution(p, p_crit, net_distance, is_valid)
     plot([0, vars.x_end], [0, 0], "black"); % table
 
     plot(p(:, 1), p(:, 3)); % plot graph
-    plot(p_crit(:, 1), p_crit(:, 2), "redo"); % plot bounce points
+    if ~isempty(p_crit)
+        plot(p_crit(:, 1), p_crit(:, 2), "redo"); % plot bounce points
+    end
 
     % plot intesection with net
     if(net_distance <= 1e-4)
