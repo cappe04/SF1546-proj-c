@@ -10,10 +10,10 @@ function net_dist = f(v)
     [~, ~, net_dist, ~, ~] = step_solve(vars, [0, v, vars.y_start, 0], h);
 end
 
-v1 = secant(@f, 4.8, 5, 1e-8, 500); % 2.85 & 2.95, 4.8 & 5
+[v1, ~] = secant(@f, 4.8, 5, 1e-8, 500); % 2.85 & 2.95, 4.8 & 5
 [u1, p_crit1, net_dist1, E1, ~] = step_solve(vars, [0, v1, vars.y_start, 0], h);
 
-v2 = secant(@f, 2.85, 2.95, 1e-8, 500); % 2.85 & 2.95, 4.8 & 5
+[v2, ~] = secant(@f, 2.85, 2.95, 1e-8, 500); % 2.85 & 2.95, 4.8 & 5
 [u2, p_crit2, net_dist2, E2, ~] = step_solve(vars, [0, v2, vars.y_start, 0], h);
 
 plot_solution(u1, p_crit1, net_dist1, false);

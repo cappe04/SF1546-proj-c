@@ -36,8 +36,8 @@ function [t_new, u_new, t_err] = interp(t, u_all, i_to_interp, A)
     [u_new, t_h] = f(t3, t4, t5, u3, u4, u5);
     [~, t_2h] = f(t1, t3, t5, u1, u3, u5);
 
+    t_err = abs(t_h - t_2h);
     t_new = t_h;
-    t_err = abs(t_h - t_2h)/3; % Rich extrapolation p=2
 
     
     % function [u, dt] = f(u1, u2, h)

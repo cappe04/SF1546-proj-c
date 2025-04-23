@@ -14,6 +14,8 @@ plot_solution(u, p_crit, net_dist, valid_serve);
 
 
 % VÄRDEN
+NET_DISTANCE = net_dist
+ERROR_NET = E.net
 
 PUNKTER_X = p_crit(1:2, 1)
 ERROR_X = p_crit(1:2, 3)
