@@ -52,7 +52,11 @@ function [u, p_crit, net_dist, t] = solve(u0, vars)
         end
 
         u = [u, sol.y];
-        t = [t, t(end) + sol.x];
+        if(~isempty(t))
+            t = [t, t(end) + sol.x];
+        else
+            t = sol.x;
+        end
     end
 
     u = u';
