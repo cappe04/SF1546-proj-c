@@ -4,7 +4,7 @@ function [p_crit, net_dist, E] = f(mask)
 
     vars = get_vars(ones(1, 8) + mask(1:8));
 
-    h = 0.001; % sänkt från vanliga A
+    h = 0.0001; % sänkt från vanliga A
 
     [~, p_crit, net_dist, E, ~] = step_solve(vars, [0, 4*(mask(9) + 1), vars.y_start, 0], h);
     p_crit = p_crit(1:2, 1:2);
@@ -50,6 +50,8 @@ end
 % PRINTA VÄRDEN
 PUNKTER = p_crit_ref
 PUNKTER_FEL = err_p
+
+err_p ./ p_crit_ref
 
 NET = net_dist_ref
 NET_ERROR = err_n
