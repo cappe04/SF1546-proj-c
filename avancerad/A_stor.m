@@ -5,7 +5,7 @@ function [p_crit, net_dist] = f(mask)
     vars = get_vars(ones(1, 8) + mask(1:8));
 
 
-    [~, p_crit, net_dist, ~] = solve([0, 4*(mask(9) + 1), vars.y_start, 0], vars);
+    [~, p_crit, net_dist, ~] = solve([0, 4*(1 + mask(9)), vars.y_start, 0], vars);
     p_crit = p_crit(1:2, 1:2);
 
 end
@@ -48,8 +48,8 @@ end
 % PRINTA VÄRDEN
 PUNKTER = p_crit_ref
 PUNKTER_FEL = err_p
-PUNKTER_REL_FEL = err_p(:, 1)./p_crit_ref(:,1) *100
 
+PUNKTER_REL_FEL = err_p ./ p_crit_ref
 
 NET = net_dist_ref
 NET_ERROR = err_n

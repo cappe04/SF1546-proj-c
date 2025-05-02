@@ -20,21 +20,13 @@ function [] = B()
     plot_solution(u1, p_crit1, net_dist1, false);
     hold on;
     plot_solution(u2, p_crit2, net_dist2, false);
-    
-    
-    % FEL I NÄT MED EN HASITGHET INOM V +- 1e-8
-    % VELOCITY_1 = v1
-    % NET_DISTANCE_1 = net_dist1
-    % ERROR_1 = E1.net
-    
-    % VELOCITY_2 = v2
-    % NET_DISTANCE_2 = net_dist2
-    % ERROR_2 = E2.net
-    % end
 
+
+    % FEL I NÄT MED EN HASITGHET INOM V +- 1e-10
     VELOCITY_1 = v1
     NET_DISTANCE_1 = net_dist1
 
     VELOCITY_2 = v2
     NET_DISTANCE_2 = net_dist2
+
     end
