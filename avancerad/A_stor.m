@@ -1,17 +1,16 @@
 clear; format long;
 
-function [p_crit, net_dist, E] = f(mask)
+function [p_crit, net_dist] = f(mask)
 
     vars = get_vars(ones(1, 8) + mask(1:8));
 
-    h = 0.0001; % sänkt från vanliga A
 
-    [~, p_crit, net_dist, E, ~] = step_solve(vars, [0, 4*(mask(9) + 1), vars.y_start, 0], h);
+    [~, p_crit, net_dist, ~] = solve([0, 4*(mask(9) + 1), vars.y_start, 0], vars);
     p_crit = p_crit(1:2, 1:2);
 
 end
 
-[p_crit_ref, net_dist_ref, E_ref] = f(zeros(1,9));
+[p_crit_ref, net_dist_ref] = f(zeros(1,9));
 
 err_p = [0 0];
 err_n = 0;
@@ -20,12 +19,11 @@ for i=1:9
 
     mask = zeros(1, 9);
     mask(i) = 0.01;
-    
     % ner
-    [p_crit_down, net_dist_down, E_down] = f(-mask);
+    [p_crit_down, net_dist_down] = f(-mask);
     
     % upp
-    [p_crit_upp, net_dist_upp, E_upp] = f(mask);
+    [p_crit_upp, net_dist_upp] = f(mask);
     
     ep_down = abs(p_crit_ref - p_crit_down);
     ep_upp = abs(p_crit_ref - p_crit_upp);
@@ -50,8 +48,8 @@ end
 % PRINTA VÄRDEN
 PUNKTER = p_crit_ref
 PUNKTER_FEL = err_p
+PUNKTER_REL_FEL = err_p(:, 1)./p_crit_ref(:,1) *100
 
-err_p ./ p_crit_ref
 
 NET = net_dist_ref
 NET_ERROR = err_n
