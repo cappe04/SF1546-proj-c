@@ -4,7 +4,7 @@ vars = get_vars(ones(8,1));
 
 [u, p_crit, net_dist, t] = solve([0, 4, vars.y_start, 0], vars);
 
-(size(p_crit, 1) + 1) * 1e-10;
+total_err = (size(p_crit, 1) + 1) * 1e-10;
 
 valid_serv = validate_serve(vars, p_crit, net_dist);
 

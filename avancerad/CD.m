@@ -26,5 +26,5 @@ function [] = CD()
     
     % Del D, tiden för kantboll
     TOTAL_TIME = t(end)
-        
+
     end

@@ -2,7 +2,7 @@ function [u, p_crit, net_dist, t] = solve(u0, vars)
 
     function [value, isterminal, direction] = event(t, y)
 
-        value = [y(3), 2.42-y(1), 1.21-y(1)];
+        value = [y(3), vars.x_end-y(1), vars.x_net-y(1)];
         isterminal = [1 1 0];
         direction = [-1 0 -1];
 
