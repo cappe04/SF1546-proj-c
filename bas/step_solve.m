@@ -28,6 +28,7 @@ function [u, p_crit, net_dist, E, t] = step_solve(vars, u0, h)
     while u(end, 1) < vars.x_end
         u(i+1, :) = rk4_step(f, t(i), u(i, :), h);
 
+        % går varanat steg för felskattning
         if(mod(i-u2h_offset, 2) == 0)
             u2h = rk4_step(f, t(i), u2h, 2*h);
         end

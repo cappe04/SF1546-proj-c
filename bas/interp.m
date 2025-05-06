@@ -1,6 +1,7 @@
 function [t_new, u_new, t_err] = interp(t, u_all, i_to_interp, A)
 
-    % kt + u_i = a
+    % interpolerar och hittar tiden samt det nya värdet för:
+    % at^2 + bt + c = A
     % Kan hitta fel i u genom att t_err * u', alt. k från rk4
 
     i = i_to_interp;
@@ -38,23 +39,5 @@ function [t_new, u_new, t_err] = interp(t, u_all, i_to_interp, A)
 
     t_err = abs(t_h - t_2h);
     t_new = t_h;
-
-    
-    % function [u, dt] = f(u1, u2, h)
-    %     k = @(u1, u2) (u2 - u1)/h;
-
-    %     dt = (A - u1(i)) / k(u1(i), u2(i));
-    %     u = k(u1, u2)*dt + u1;
-    % end
-
-    % u1 = u_all(end-2, :);
-    % u2 = u_all(end-1, :);
-    % u3 = u_all(end, :);
-
-    % [u_new, dt] = f(u2, u3, h);
-    % [~, dt_err] = f(u1, u3, 2*h);
-
-    % t_err = abs(dt - dt_err);
-    % t_new = t0 + dt;
 
 end
