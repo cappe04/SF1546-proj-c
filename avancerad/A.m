@@ -7,7 +7,6 @@ vars = get_vars(ones(8,1));
 total_err = (size(p_crit, 1) + 1) * 1e-10;
 
 valid_serv = validate_serve(vars, p_crit, net_dist);
-
 plot_solution(u, p_crit, net_dist, valid_serv);
 
 % VÄRDEN

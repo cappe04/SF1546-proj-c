@@ -13,7 +13,7 @@ function [x, dx] = secant(f, x1, x2, tol, iter)
         if(abs(dx(i)) < tol)
             break;
         end     
+
     end
     dx = abs(dx);
-
 end
